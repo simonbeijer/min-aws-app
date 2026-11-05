@@ -1,14 +1,35 @@
-import { useState } from 'react'
-import './App.css'
+import { useEffect, useState } from "react";
+
+const API = import.meta.env.VITE_API_URL;
 
 function App() {
-return (
-<main style={{ fontFamily: "sans-serif"
-, padding: "2rem" }}>
-<h1>Hej från AWS Amplify!</h1>
-<p>Den här appen byggs automatiskt när jag pushar till GitHub.</p>
-<p>Molnutveckling med AWS – vecka 39</p>
-</main>
-);
+  const [customers, setCustomers] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API}/customers`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(setCustomers)
+      .catch((err) => setError(err.message));
+  }, []);
+
+  return (
+    <main style={{ fontFamily: "sans-serif", padding: "2rem" }}>
+      <h1>Kunder</h1>
+      {error && <p style={{ color: "crimson" }}>Fel: {error}</p>}
+      <ul>
+        {customers.map((c) => (
+          <li key={c.id}>
+            {c.id}. {c.name}
+          </li>
+        ))}
+      </ul>
+      <p>Molnutveckling med AWS, vecka 41. API: {API}</p>
+    </main>
+  );
 }
+
 export default App;
